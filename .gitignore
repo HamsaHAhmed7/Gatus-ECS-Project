@@ -1,0 +1,97 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+env/
+.venv/
+venv/
+.Python
+
+# Docker
+*.log
+docker-compose.override.yml
+docker.env
+.docker/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+terraform.tfvars.json
+crash.log
+override.tf
+override.tf.json
+.plan
+
+# AWS Credentials (if mistakenly created)
+.aws/
+
+# GitHub Actions
+.github/workflows/*.secrets.yml
+
+# VSCode / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Backup or temp files
+*.bak
+*.tmp
+*.old
+*.orig
+*.save
+
+# Node (in case DefectDojo frontend is included)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System or deployment files
+.env
+.env.*
+*.pem
+*.crt
+*.key
+
+# Optional: exclude architecture diagram source files
+*.drawio
+*.vsdx
+
+# ignore up-stream code we just removed
+components/
+ct.yaml
+docker/
+docker-compose.override.*
+docs/
+dojo/
+fixture-updater/
+helm/
+manage.py
+nginx/
+readme-docs/
+requirements-*.txt
+ruff.toml
+run-*.sh
+tests/
+unittests/
+wsgi.py
+wsgi_params/
+
+# Keep your scripts & extra_settings, ignore nothing in them
+!scripts/
+!extra_settings/
+
+# Standard ignores
+.env
+.terraform/
+*.tfstate
