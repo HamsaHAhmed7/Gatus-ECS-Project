@@ -27,3 +27,17 @@ module "iam" {
   source = "./modules/iam"
   create_task_role = true
 }
+
+module "ecs_cluster" {
+  source       = "./modules/ecs-cluster"
+  cluster_name = "gatus-cluster"
+}
+
+module "ecs_task" {
+  source             = "./modules/ecs-task"
+  family             = "gatus-task"
+  execution_role_arn = module.iam.execution_role_arn
+  task_role_arn      = null
+  image_url          = "016873651140.dkr.ecr.eu-west-2.amazonaws.com/gatus-project:latest"
+  aws_region         = "eu-west-2"
+}
