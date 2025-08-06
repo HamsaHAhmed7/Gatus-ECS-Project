@@ -22,3 +22,8 @@ module "alb" {
   subnets_id_list = var.subnets_id_list
   vpc_id          = var.vpc_id
 }
+
+module "iam" {
+  source = "./modules/iam"
+  create_task_role = true
+}
