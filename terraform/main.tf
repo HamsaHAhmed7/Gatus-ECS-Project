@@ -10,3 +10,8 @@ terraform {
 provider "aws" {
   # Configuration options
 }
+
+module "sg" {
+  source = "./modules/sg"
+  vpc_id = var.vpc_id
+}
