@@ -3,3 +3,10 @@ variable "vpc_id" {
   type        = string
   default     = "vpc-0c99b83f91ca5ab91" 
 }
+
+variable "subnets_id_list" {
+  description = "Public subnet IDs for the ALB"
+  type        = list(string)
+}
+
+
