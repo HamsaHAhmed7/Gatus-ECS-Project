@@ -48,7 +48,7 @@ module "ecs_service" {
   cluster_id          = module.ecs_cluster.cluster_arn
   task_definition_arn = module.ecs_task.task_definition_arn
   subnets_id_list     = var.subnets_id_list
-  sg_id               = module.sg.sg_id
+  sg_id = module.sg.ecs_sg_id
   target_group_arn    = module.alb.target_group_arn
   container_name      = "gatus"
   container_port      = 8080
