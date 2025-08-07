@@ -27,8 +27,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-        
-          docker build -t gatus-project:latest .
+          docker build -t gatus-project:latest \
+          -f ./Docker/Dockerfile ./Docker
+
 
       - name: Tag Docker image
         run: |
@@ -39,11 +40,14 @@ jobs:
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest
 
      
-      - name: Terraform Apply (Optional)
-        run: |
-          cd Gatus-ECS-Project/terraform/
-          terraform init
-          terraform apply -auto-approve
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: ./terraform
+        run: terraform apply -auto-approve
+
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
