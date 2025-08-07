@@ -1,3 +1,8 @@
+output "custom_domain_url" {
+  description = "The custom HTTPS domain for the Gatus app"
+  value       = "https://${module.dns.domain_name}"
+}
+
 #ALB Outputs
 output "alb_dns_name" {
   description = "DNS name of the Application Load Balancer"

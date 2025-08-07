@@ -11,4 +11,9 @@ output "target_group_arn" {
 output "alb_arn" {
   description = "ARN of the ALB"
   value       = aws_lb.gatus_alb.arn
+
 }
+output "alb_zone_id" {
+  value = aws_lb.gatus_alb.zone_id
+}
+
