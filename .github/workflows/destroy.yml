@@ -8,7 +8,7 @@ permissions:
 jobs:
   destroy:
     runs-on: ubuntu-latest
-    environment: production   
+    environment: production  
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/configure-aws-credentials@v2
