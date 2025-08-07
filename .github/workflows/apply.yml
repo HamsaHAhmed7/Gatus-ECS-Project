@@ -1,14 +1,9 @@
-name: Destroy Infrastructure
+name: Manual Terraform Apply
 on: { workflow_dispatch: {} }
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
-  destroy:
+  apply:
     runs-on: ubuntu-latest
-    environment: production   
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/configure-aws-credentials@v2
@@ -24,9 +19,10 @@ jobs:
         working-directory: ./terraform
         run: terraform init
 
-      - name: Terraform destroy
+      - name: Terraform apply
         working-directory: ./terraform
         env:
           TF_VAR_vpc_id:          ${{ secrets.TF_VAR_VPC_ID }}
           TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}
-        run: terraform destroy -auto-approve -input=false
+          TF_VAR_image_url:       ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ github.sha }}
+        run: terraform apply -auto-approve -input=false
