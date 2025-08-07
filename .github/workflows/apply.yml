@@ -1,0 +1,32 @@
+name: Destroy Infrastructure
+on: { workflow_dispatch: {} }
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment: production   # add branch protection/required reviewers on this env
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ secrets.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v2
+        with: { terraform_version: 1.8.5 }
+
+      - name: Terraform init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform destroy
+        working-directory: ./terraform
+        env:
+          TF_VAR_vpc_id:          ${{ secrets.TF_VAR_VPC_ID }}
+          TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}
+        run: terraform destroy -auto-approve -input=false
