@@ -31,9 +31,11 @@ module "ecs_task" {
   family             = "gatus-task"
   execution_role_arn = module.iam.execution_role_arn
   task_role_arn      = null
-  image_url          = "016873651140.dkr.ecr.eu-west-2.amazonaws.com/gatus-project:latest"
+  image_url          = var.image_url   # <— now driven by CI
   aws_region         = "eu-west-2"
 }
+
+
 
 module "ecs_service" {
   source              = "./modules/ecs-service"

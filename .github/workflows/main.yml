@@ -32,11 +32,16 @@ jobs:
             -f ./Docker/Dockerfile ./Docker
 
       - name: Push Docker image to ECR
+        env:
+        ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
+        REGION:  ${{ secrets.AWS_REGION }}
+        TAG:     ${{ steps.vars.outputs.IMAGE_TAG }}
         run: |
-          docker tag gatus-project:latest \
-            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest
-          docker push \
-            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest
+          REPO="$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/gatus-project"
+          docker tag gatus-project:latest "$REPO:latest"
+          docker tag gatus-project:latest "$REPO:$TAG"
+          docker push "$REPO:latest"
+          docker push "$REPO:$TAG"
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
@@ -50,7 +55,6 @@ jobs:
       - name: Terraform Apply
         working-directory: ./terraform
         env:
-          
           TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
           TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }} 
-        run: terraform apply -auto-approve -input=false
+          run: terraform apply -auto-approve -input=false
