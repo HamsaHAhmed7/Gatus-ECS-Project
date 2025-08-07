@@ -29,4 +29,5 @@ jobs:
         env:
           TF_VAR_vpc_id:          ${{ secrets.TF_VAR_VPC_ID }}
           TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}
+          TF_VAR_image_url: "unused-for-destroy"
         run: terraform destroy -auto-approve -input=false
