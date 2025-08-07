@@ -3,7 +3,7 @@ name: Deploy Gatus ECS Project
 on:
   push:
     branches:
-      - main  
+      - main
 
 jobs:
   deploy:
@@ -11,40 +11,38 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region:            ${{ secrets.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
-            | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+            | docker login --username AWS --password-stdin \
+              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
       - name: Build Docker image
         run: |
           docker build -t gatus-project:latest \
-          -f ./Docker/Dockerfile ./Docker
-
-
-      - name: Tag Docker image
-        run: |
-          docker tag gatus-project:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest
+            -f ./Docker/Dockerfile ./Docker
 
       - name: Push Docker image to ECR
         run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest
+          docker tag gatus-project:latest \
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest
+          docker push \
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.8.5
 
-     
       - name: Terraform Init
         working-directory: ./terraform
         run: terraform init
@@ -52,11 +50,7 @@ jobs:
       - name: Terraform Apply
         working-directory: ./terraform
         env:
-    TF_VAR_vpc_id: ${{ secrets.TF_VAR_vpc_id }}
-    TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_subnets_id_list }}
-    run: terraform apply -auto-approve -input=false
-    
-    
-    env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
+          TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
+          TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }} 
+        run: terraform apply -auto-approve -input=false
