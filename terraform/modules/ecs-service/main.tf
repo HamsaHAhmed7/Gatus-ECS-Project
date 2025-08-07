@@ -4,6 +4,8 @@ resource "aws_ecs_service" "this" {
   task_definition = var.task_definition_arn
   launch_type     = "FARGATE"
   desired_count   = var.desired_count
+  force_new_deployment = true
+
 
   network_configuration {
     subnets         = var.subnets_id_list
