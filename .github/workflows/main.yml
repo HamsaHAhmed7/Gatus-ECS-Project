@@ -2,8 +2,7 @@ name: Deploy Gatus ECS Project
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -26,6 +25,11 @@ jobs:
             | docker login --username AWS --password-stdin \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
+      # NEW: create a short tag from the commit SHA
+      - name: Set image tag
+        id: vars
+        run: echo "IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-12)" >> $GITHUB_OUTPUT
+
       - name: Build Docker image
         run: |
           docker build -t gatus-project:latest \
@@ -33,9 +37,9 @@ jobs:
 
       - name: Push Docker image to ECR
         env:
-        ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
-        REGION:  ${{ secrets.AWS_REGION }}
-        TAG:     ${{ steps.vars.outputs.IMAGE_TAG }}
+          ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
+          REGION:  ${{ secrets.AWS_REGION }}
+          TAG:     ${{ steps.vars.outputs.IMAGE_TAG }}
         run: |
           REPO="$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/gatus-project"
           docker tag gatus-project:latest "$REPO:latest"
@@ -55,6 +59,7 @@ jobs:
       - name: Terraform Apply
         working-directory: ./terraform
         env:
-          TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
-          TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }} 
-          run: terraform apply -auto-approve -input=false
+          TF_VAR_vpc_id:               ${{ secrets.TF_VAR_VPC_ID }}
+          TF_VAR_subnets_id_list:      ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}  # JSON array string
+          TF_VAR_image_url:            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}
+        run: terraform apply -auto-approve -input=false
