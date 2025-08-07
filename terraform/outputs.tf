@@ -4,10 +4,10 @@ output "custom_domain_url" {
 }
 
 #ALB Outputs
-output "alb_dns_name" {
-  description = "DNS name of the Application Load Balancer"
-  value       = module.alb.alb_dns_name
-}
+#output "alb_dns_name" {
+#description = "DNS name of the Application Load Balancer"
+#  value       = module.alb.alb_dns_name
+#}
 
 #ECS Cluster Outputs
 output "ecs_cluster_name" {
