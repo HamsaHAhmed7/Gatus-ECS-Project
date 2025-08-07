@@ -27,7 +27,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cd Gatus-ECS-Project/Docker/
+        
           docker build -t gatus-project:latest .
 
       - name: Tag Docker image
