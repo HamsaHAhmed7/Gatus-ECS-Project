@@ -18,10 +18,22 @@ The deployment is designed for **scalability, automation, and security**, using:
 - **GitHub Actions** for build, deploy, and destroy workflows
 
 ---
+## Architecture Diagram
+
+![ECS Architecture](docs/gatus2.drawio.png)
+
+---
 
 ## Live Demo
 
 https://gatus.hamsa-ahmed.co.uk/
+
+---
+
+## Video Demo 
+
+
+
 
 ---
 
