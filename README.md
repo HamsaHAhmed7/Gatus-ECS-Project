@@ -42,17 +42,40 @@ https://github.com/user-attachments/assets/d1f58ef3-babf-4931-8671-de25c05f3932
 
 
 ---
+## Local Development Setup
 
-## Key Highlights
+### Prerequisites
+- [Docker](https://www.docker.com/)
+- [Terraform](https://www.terraform.io/)
+- [AWS CLI](https://aws.amazon.com/cli/)
+- AWS account with required permissions
 
-- **Private Subnet Isolation** – ECS Fargate tasks run without public IPs to minimize attack surface  
-- **Application Load Balancer (ALB)** – Handles HTTPS and routes to ECS tasks  
-- **TLS Encryption** – ACM-issued certificates enforce HTTPS  
-- **Immutable Deployments** – Always deploy by **ECR image digest**, not tags  
-- **Automated Security Scans** – Trivy scans all images before deployment  
-- **Automated CI/CD** – Build, scan, push, deploy, and destroy via GitHub Actions  
-- **Secrets Management** – AWS credentials & Terraform variables stored in GitHub Secrets  
-- **Least-Privilege IAM** – ECS execution roles and GitHub Actions assume only necessary permissions  
+### Steps
+
+```bash
+# 1. Clone repository
+git clone https://github.com/HamsaHAhmed7/Gatus-ECS-Project.git
+cd Gatus-ECS-Project
+
+# 2. Build Docker image locally
+docker build -t gatus-local -f Docker/Dockerfile Docker/
+
+# 3. Run locally
+docker run -p 8080:8080 gatus-local
+```
+
+---
+
+## Why This Project?
+
+This setup demonstrates real-world AWS DevOps deployment practices:
+
+- **Secure networking** with private subnets
+- **Automated builds** and deployments
+- **Modular IaC** with Terraform
+- **TLS encryption** for all traffic
+- **Fully reproducible infrastructure**
+
 ---
 
 ## Technologies Used
@@ -161,42 +184,6 @@ Tears down:
 - Route 53 DNS Records  
 - VPC-related resources  
 
-
----
-
-## Local Development Setup
-
-### Prerequisites
-- [Docker](https://www.docker.com/)
-- [Terraform](https://www.terraform.io/)
-- [AWS CLI](https://aws.amazon.com/cli/)
-- AWS account with required permissions
-
-### Steps
-
-```bash
-# 1. Clone repository
-git clone https://github.com/HamsaHAhmed7/Gatus-ECS-Project.git
-cd Gatus-ECS-Project
-
-# 2. Build Docker image locally
-docker build -t gatus-local -f Docker/Dockerfile Docker/
-
-# 3. Run locally
-docker run -p 8080:8080 gatus-local
-```
-
-
-
-## Why This Project?
-
-This setup demonstrates real-world AWS DevOps deployment practices:
-
-- **Secure networking** with private subnets
-- **Automated builds** and deployments
-- **Modular IaC** with Terraform
-- **TLS encryption** for all traffic
-- **Fully reproducible infrastructure**
 
 ---
 
