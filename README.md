@@ -30,10 +30,9 @@ https://gatus.hamsa-ahmed.co.uk/
 
 ---
 
-## Video Demo 
+## 📽 Live Demo Video
 
-
-
+https://github.com/HamsaHAhmed7/Gatus-ECS-Project/blob/main/docs/gatus-live-demo.mp4
 
 ---
 
