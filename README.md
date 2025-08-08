@@ -1,146 +1,123 @@
-ECS: End-to-End DevOps Deployment of Gatus on AWS
-Terraform · GitHub Actions · Docker · AWS
+# ECS: End-to-End DevSecOps on AWS – Gatus Deployment
 
-Gatus Uptime Monitoring – Overview
-Welcome to the Gatus ECS Project, a production-ready, containerised uptime monitoring solution deployed to AWS using modern DevOps practices.
+## Gatus Uptime Monitoring – Overview
 
-Gatus is an open-source service that continuously monitors your endpoints and provides a visual status dashboard. This project demonstrates the full DevOps lifecycle — from containerisation and CI/CD to automated AWS infrastructure provisioning — all while enforcing best practices for scalability, automation, and security.
+Welcome to the **Gatus ECS Deployment**, a production-grade, containerised uptime monitoring and status page application.  
+It’s deployed securely on **AWS ECS Fargate**, leveraging **Terraform** for Infrastructure as Code, **GitHub Actions** for CI/CD automation, and **Amazon ECR** for container image storage.
 
-The application runs inside private subnets within AWS, ensuring workloads are isolated from direct public exposure. All incoming traffic is routed through an Application Load Balancer (ALB) in a public subnet, with HTTPS enabled via AWS Certificate Manager (ACM) and DNS management handled by Route 53.
+The architecture follows security best practices:
+- **Private subnets** for all ECS workloads
+- **Public ALB** for HTTPS traffic termination
+- **Cloudflare DNS** for domain resolution and protection
+- **AWS Certificate Manager (ACM)** for TLS/SSL
 
-Infrastructure is fully automated with Terraform, and GitHub Actions handles the build, push, and deployment process. Docker images are pushed to Amazon ECR, and IAM follows the principle of least privilege.
+Infrastructure provisioning, application deployment, and updates are fully automated — enabling repeatable, consistent, and secure releases.
 
-This architecture is a practical, interview-ready example of an automated, secure cloud deployment.
+---
 
-Live Demo
-🌐 https://gatus.hamsa-ahmed.co.uk
+## Key Highlights
 
-Key Highlights
-Private Subnet Isolation: ECS Fargate tasks run in private subnets with no direct internet access.
+- **Private Subnet Isolation** – No direct internet exposure to ECS tasks. All inbound traffic flows through an ALB.
+- **Containerised Gatus** – Consistent, reproducible deployments using Docker.
+- **Infrastructure as Code** – Modular Terraform configuration for scalability and reusability.
+- **CI/CD Pipeline** – Automated Docker build, push to ECR, and ECS deployment via GitHub Actions.
+- **Secure by Design** – HTTPS enforced via ACM, DNS managed through Cloudflare, and IAM least-privilege roles.
 
-HTTPS Security: End-to-end encryption using ACM-issued TLS certificates.
+---
 
-Infrastructure as Code: Fully modular Terraform for consistent, repeatable deployments.
+## Technologies Used
 
-CI/CD Pipeline: GitHub Actions automates Docker builds, ECR pushes, and Terraform applies/destroys.
+| Category       | Tools/Services                                    |
+|----------------|----------------------------------------------------|
+| **Cloud**      | AWS ECS (Fargate), ALB, ECR, ACM, VPC, S3           |
+| **DNS & TLS**  | Cloudflare DNS, ACM TLS Certificates               |
+| **IaC**        | Terraform (modular structure)                      |
+| **CI/CD**      | GitHub Actions (build, deploy, destroy)            |
+| **Security**   | IAM, SSL, Cloudflare proxying                       |
+| **Container**  | Docker (multi-stage build)                         |
 
-Custom Config: Gatus configured to monitor its own health endpoint and the public domain over HTTPS.
+---
 
-Technologies Used
-Category	Tools/Services
-Cloud	AWS ECS (Fargate), ALB, ECR, ACM, VPC, CloudWatch
-DNS & TLS	Route 53, ACM TLS Certificates
-IaC	Terraform (Modular)
-CI/CD	GitHub Actions
-Security	IAM (Least Privilege), HTTPS
-Container	Docker
+## Architecture Overview
 
-Architecture Overview
-This deployment follows a multi-subnet VPC design:
+This deployment uses a **multi-subnet AWS VPC** for strict network segregation.
 
-Public Subnet
-Application Load Balancer (ALB)
+- **Public Subnet** hosts:
+  - Application Load Balancer (ALB)
+  - ACM certificates
+  - Cloudflare DNS entry point
 
-ACM Certificates
+- **Private Subnet** hosts:
+  - ECS Fargate tasks running Gatus
+  - NAT Gateway for outbound traffic
+  - Amazon S3 (remote backend state storage)
 
-Route 53 DNS routing
+No ECS tasks are exposed directly to the internet — aligning with **zero-trust architecture principles**.
 
-Private Subnet
-ECS Fargate tasks running the Gatus container
+---
 
-NAT Gateway for outbound traffic only (e.g., updates)
+## Architecture Diagram
 
-No inbound traffic allowed directly
-
-Flow:
-Route 53 → ALB (HTTPS) → ECS Fargate (Private Subnet)
-
-Architecture Diagram
-(Insert Lucidchart/draw.io/mermaid diagram here showing GitHub Actions → ECR → Terraform → ECS → ALB → HTTPS → Route 53)
-
-Project Structure
-bash
-Copy
-Edit
-Gatus-ECS-Project/
-├── Docker/
-│   ├── Dockerfile
-│   └── config.yaml
-├── terraform/
-│   ├── main.tf
-│   ├── variables.tf
-│   ├── outputs.tf
-│   ├── modules/
-│   │   ├── ecs-cluster/
-│   │   ├── ecs-task/
-│   │   ├── ecs-service/
-│   │   ├── alb/
-│   │   ├── acm/
-│   │   ├── route53/
-│   │   └── sg/
-├── .github/
-│   └── workflows/
-│       ├── main.yml   # Build, push, deploy
-│       └── destroy.yml # Destroy infrastructure
 CI/CD Workflow Overview
-Deployment Steps:
-
-Push to main branch or trigger workflow manually.
-
-GitHub Actions builds Docker image from ./Docker and pushes to Amazon ECR.
-
-Terraform runs via GitHub Actions to provision ECS, ALB, ACM, Route 53, IAM, and networking.
-
-ECS Fargate launches container with latest image.
-
-ALB routes HTTPS traffic to ECS tasks.
-
-Destroy Steps:
-
-Manually trigger the destroy.yml workflow in GitHub Actions.
-
-Screenshots
-(Add screenshots of your live Gatus dashboard and domain here)
-
-Local Development Setup
-Prerequisites:
-
-Docker
-
-AWS CLI
-
-Terraform
-
-GitHub CLI (optional)
-
-Run locally:
-
 bash
 Copy
 Edit
-# 1. Clone repository
-git clone https://github.com/<your-username>/Gatus-ECS-Project.git
-cd Gatus-ECS-Project
+# 1. Push to main branch OR trigger build.yml manually
+#    → GitHub Actions builds Docker image from /app and pushes to ECR
+
+# 2. Manually trigger Terraform workflows in sequence:
+#    a. terraform-init-plan.yml
+#    b. terraform-apply.yml
+
+# 3. ECS Fargate pulls latest container image from ECR
+
+# 4. ALB routes HTTPS traffic to ECS tasks
+
+# 5. Cloudflare resolves DNS for tm.hamsa-ahmed.co.uk → ALB
+# Screenshots
+(Replace screenshots)
+
+
+
+
+
+## Local Development Setup
+You can run Gatus locally with Docker for testing:
+
+# Prerequisites
+Docker
+Git
+
+## Steps
+
+# 1. Clone the repository
+git clone https://github.com/your-org/gatus-ecs-deployment.git
+cd gatus-ecs-deployment
 
 # 2. Build Docker image
-docker build -t gatus-project:latest -f Docker/Dockerfile Docker
+docker build -t gatus .
 
 # 3. Run container locally
-docker run -p 8080:8080 gatus-project:latest
-Visit: http://localhost:8080
+docker run -p 8080:8080 gatus
 
-Why This Project?
-This project demonstrates real-world DevOps capabilities:
 
-Cloud-native deployment on AWS ECS Fargate
 
-Automated infrastructure with Terraform modules
 
-End-to-end CI/CD pipeline with GitHub Actions
 
-Security best practices: HTTPS, least privilege IAM, no public ECS access
+## Why This Project?
+This project demonstrates:
 
-Interview-ready example for showcasing DevOps skills
+Real-world DevOps skills – AWS ECS, ALB, ACM, Cloudflare DNS, ECR, IAM.
 
-License
-MIT License — free to use, modify, and deploy.
+Automation – Full IaC with Terraform and CI/CD with GitHub Actions.
+
+Security – Private subnets, HTTPS-only traffic, least-privilege IAM roles.
+
+Scalability – Modular design, easily extensible for future workloads.
+
+Perfect for showcasing hands-on DevSecOps capability in interviews or portfolios.
+
+
+
+
+
