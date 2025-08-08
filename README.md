@@ -7,15 +7,17 @@
 
 ## Overview
 
-This project deploys **Gatus**, an open-source uptime monitoring tool, onto **AWS ECS Fargate** using a fully automated **CI/CD pipeline** and **Infrastructure as Code** (IaC) with Terraform.
 
-The deployment is designed for **scalability, automation, and security**, using:
+This project deploys **Gatus**, an open-source uptime monitoring tool, onto **AWS ECS Fargate** using a fully automated **DevSecOps pipeline** with **Infrastructure as Code** (Terraform).
+
+The deployment prioritizes **security, automation, and scalability** with:
 - **Private subnets** for ECS tasks (no direct internet access)
-- An **Application Load Balancer (ALB)** for HTTPS routing
+- **Application Load Balancer (ALB)** for HTTPS routing
 - **AWS Certificate Manager (ACM)** for TLS certificates
 - **Route 53** for DNS management
-- **Amazon ECR** for Docker image storage
-- **GitHub Actions** for build, deploy, and destroy workflows
+- **Amazon ECR** for secure image storage
+- **Trivy** for automated image vulnerability scanning
+- **GitHub Actions** for CI/CD automation (build, scan, deploy, destroy)
 
 ---
 ## Architecture Diagram
@@ -43,13 +45,14 @@ https://github.com/user-attachments/assets/d1f58ef3-babf-4931-8671-de25c05f3932
 
 ## Key Highlights
 
-- **Private Subnet Isolation** – ECS Fargate tasks run in private subnets to reduce the attack surface
-- **Application Load Balancer (ALB)** – Handles HTTPS traffic and routes it to ECS tasks
-- **TLS Encryption** – Enforced with ACM-issued certificates
-- **Automated CI/CD** – Docker builds, pushes to ECR, and Terraform apply/destroy via GitHub Actions
-- **Modular Terraform** – Reusable infrastructure modules for easy maintenance and scaling
-- **Least-Privilege IAM** – Secure ECS execution roles and restricted policies
-
+- **Private Subnet Isolation** – ECS Fargate tasks run without public IPs to minimize attack surface  
+- **Application Load Balancer (ALB)** – Handles HTTPS and routes to ECS tasks  
+- **TLS Encryption** – ACM-issued certificates enforce HTTPS  
+- **Immutable Deployments** – Always deploy by **ECR image digest**, not tags  
+- **Automated Security Scans** – Trivy scans all images before deployment  
+- **Automated CI/CD** – Build, scan, push, deploy, and destroy via GitHub Actions  
+- **Secrets Management** – AWS credentials & Terraform variables stored in GitHub Secrets  
+- **Least-Privilege IAM** – ECS execution roles and GitHub Actions assume only necessary permissions  
 ---
 
 ## Technologies Used
@@ -63,14 +66,6 @@ https://github.com/user-attachments/assets/d1f58ef3-babf-4931-8671-de25c05f3932
 | **Container**  | Docker                                      |
 
 ---
-
-## Architecture Overview
-
-- **Public Subnet** – Hosts the ALB, which terminates HTTPS connections  
-- **Private Subnet** – Runs ECS Fargate tasks for Gatus  
-- **Route 53** – DNS resolution for the custom domain  
-- **ECR** – Stores built Docker images pushed from GitHub Actions  
-- **GitHub Actions** – Automates build, push, and deploy steps
 
 ### Traffic Flow:
 1. Client request →  
@@ -136,20 +131,36 @@ Gatus-ECS-Project/
 │           └── variable.tf
 ```
 
+---
 
-## CI/CD Workflow
+## CI/CD Workflow – Secure Deployment Pipeline
 
-1. **Push to `main` branch**
-   - Triggers GitHub Actions to:
-     - Build Docker image from `Docker/Dockerfile`
-     - Push image to ECR
-     - Run Terraform to deploy infrastructure
+### **1. Deploy Workflow (`deploy.yml`)**
+Triggered on push to `main`:
+1. **Checkout Code** – Pulls the latest repository state  
+2. **Login to ECR** – Authenticates GitHub runner to AWS ECR  
+3. **Build Docker Image** – From `Docker/Dockerfile`  
+4. **Security Scan with Trivy** – Fails pipeline if any *High* or *Critical* vulnerabilities are found  
+5. **Push to ECR** – Only clean images are pushed  
+6. **Terraform Apply** – Deploys ECS Fargate service using new image digest
 
-2. **Manual Apply (`apply.yml`)**
-   - Option to manually re-deploy the latest ECR image via Terraform
+### **2. Manual Apply Workflow (`apply.yml`)**
+Manually triggered to redeploy the **latest scanned image**:
+- Resolves latest **immutable digest** from ECR  
+- Passes digest to Terraform (`TF_VAR_image_url`)  
+- Runs `terraform apply` in `./terraform` directory  
+- Waits for ECS service to become **healthy** with:
+  ```bash
+  aws ecs wait services-stable --cluster gatus-cluster --services gatus-service
+  ```
 
-3. **Manual Destroy (`destroy.yml`)**
-   - Tears down the ECS service, ALB, Route 53 records, and other resources
+### **3. Manual Destroy Workflow (`destroy.yml`)**
+Tears down:
+- ECS Service & Cluster  
+- ALB & Target Groups  
+- Route 53 DNS Records  
+- VPC-related resources  
+
 
 ---
 
