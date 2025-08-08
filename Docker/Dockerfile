@@ -8,5 +8,5 @@ COPY config.yaml /config/config.yaml
 EXPOSE 8080
 
 
-CMD ["-c", "/config/config.yaml"]
+CMD ["--config-file", "/config/config.yaml"]
 

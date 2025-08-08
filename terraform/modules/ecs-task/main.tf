@@ -12,6 +12,15 @@ resource "aws_ecs_task_definition" "this" {
       name      = "gatus"
       image     = var.image_url
       essential = true
+healthCheck = {
+  command     = ["CMD-SHELL", "wget -qO- http://127.0.0.1:${var.container_port}/ || exit 1"]
+  interval    = 30
+  timeout     = 5
+  retries     = 3
+  startPeriod = 10
+}
+
+
       portMappings = [
         {
           containerPort = var.container_port
