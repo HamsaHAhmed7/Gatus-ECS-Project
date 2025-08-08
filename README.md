@@ -136,16 +136,15 @@ docker build -t gatus-local -f Docker/Dockerfile Docker/
 
 # 3. Run locally
 docker run -p 8080:8080 gatus-local
-Why This Project?
+
+
+
+## Why This Project?
+
 This setup demonstrates real-world AWS DevOps deployment practices:
 
-Secure networking with private subnets
-
-Automated builds and deployments
-
-Modular IaC with Terraform
-
-TLS encryption for all traffic
-
-Fully reproducible infrastructure
-
+- **Secure networking** with private subnets
+- **Automated builds** and deployments
+- **Modular IaC** with Terraform
+- **TLS encryption** for all traffic
+- **Fully reproducible infrastructure**
