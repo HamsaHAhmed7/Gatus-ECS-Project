@@ -24,6 +24,27 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
             | docker login --username AWS --password-stdin \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+      
+      - name: Install TFLint
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          tflint --version
+
+      - name: Run TFLint
+        working-directory: ./terraform
+        run: tflint --recursive
+        - name: Cache Trivy DB
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ runner.os }}-v1
+
+      - name: Install Trivy
+        run: |
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz
+          tar zxvf trivy_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
+          trivy --version
 
       
       - name: Set image tag
@@ -34,6 +55,10 @@ jobs:
         run: |
           docker build -t gatus-project:latest \
             -f ./Docker/Dockerfile ./Docker
+
+      - name: Trivy scan (local image)
+        run: trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL gatus-project:latest
+
 
       - name: Push Docker image to ECR
         env:
