@@ -31,10 +31,13 @@ jobs:
           DIGEST=$(aws ecr describe-images \
             --repository-name "$REPO" \
             --query 'reverse(sort_by(imageDetails,& imagePushedAt))[0].imageDigest' \
-            -o text)
+            --output text)
+
           if [ "$DIGEST" = "None" ] || [ -z "$DIGEST" ]; then
-            echo "No images found in ECR/$REPO" >&2; exit 1
+            echo "No images found in ECR/$REPO" >&2
+            exit 1
           fi
+
           echo "IMAGE_URI=$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/$REPO@$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Terraform apply
