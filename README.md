@@ -30,9 +30,14 @@ https://gatus.hamsa-ahmed.co.uk/
 
 ---
 
-## 📽 Live Demo Video
+---
 
-[Click here to watch the live demo](docs/gatus-live-demo.mp4)
+## 📽 Live Demo
+
+Watch the 1-minute demo of the Gatus ECS project in action:
+
+https://github.com/user-attachments/assets/d1f58ef3-babf-4931-8671-de25c05f3932
+
 
 ---
 
