@@ -67,36 +67,58 @@ https://gatus.hamsa-ahmed.co.uk/
 
 ## Directory Layout
 
+```
 Gatus-ECS-Project/
+├── .github
+│   └── workflows
+│       ├── apply.yml
+│       ├── deploy.yml
+│       └── destroy.yml
+├── .gitignore
 ├── Docker
-│ ├── Dockerfile
-│ ├── config.yaml
-│ └── docker-compose.yaml
+│   ├── Dockerfile
+│   ├── config.yaml
+│   └── docker-compose.yaml
 ├── README.md
 ├── terraform
-│ ├── backend.tf
-│ ├── main.tf
-│ ├── variables.tf
-│ ├── terraform.tfvars
-│ ├── outputs.tf
-│ ├── modules
-│ │ ├── acm/
-│ │ ├── alb/
-│ │ ├── ecs-cluster/
-│ │ ├── ecs-service/
-│ │ ├── ecs-task/
-│ │ ├── iam/
-│ │ ├── route53/
-│ │ └── sg/
-└── .github
-└── workflows/
-├── deploy.yml
-├── apply.yml
-└── destroy.yml
-
-yaml
-Copy
-Edit
+│   ├── backend.tf
+│   ├── main.tf
+│   ├── outputs.tf
+│   ├── variables.tf
+│   └── modules
+│       ├── acm
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── alb
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── ecs-cluster
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variable.tf
+│       ├── ecs-service
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── ecs-task
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── iam
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── route53
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       └── sg
+│           ├── main.tf
+│           ├── outputs.tf
+│           └── variable.tf
+```
 
 ---
 
