@@ -136,6 +136,7 @@ docker build -t gatus-local -f Docker/Dockerfile Docker/
 
 # 3. Run locally
 docker run -p 8080:8080 gatus-local
+```
 
 
 
