@@ -1,7 +1,7 @@
 resource "aws_ecs_service" "this" {
   name            = var.service_name
   cluster         = var.cluster_id
-  task_definition = var.task_definition_arn
+  # task_definition = var.task_definition_arn
   launch_type     = "FARGATE"
   desired_count   = var.desired_count
   force_new_deployment = true
