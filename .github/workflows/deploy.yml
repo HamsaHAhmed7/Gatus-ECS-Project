@@ -24,7 +24,8 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
             | docker login --username AWS --password-stdin \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-      
+
+      # ===== Terraform Lint =====
       - name: Install TFLint
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
@@ -33,7 +34,19 @@ jobs:
       - name: Run TFLint
         working-directory: ./terraform
         run: tflint --recursive
-        - name: Cache Trivy DB
+
+      # ===== Dockerfile Lint =====
+      - name: Install Hadolint
+        run: |
+          wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64
+          chmod +x /usr/local/bin/hadolint
+          hadolint --version
+
+      - name: Lint Dockerfile
+        run: hadolint Docker/Dockerfile
+
+      # ===== Trivy Image Scanning =====
+      - name: Cache Trivy DB
         uses: actions/cache@v4
         with:
           path: ~/.cache/trivy
@@ -46,7 +59,6 @@ jobs:
           sudo mv trivy /usr/local/bin/
           trivy --version
 
-      
       - name: Set image tag
         id: vars
         run: echo "IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-12)" >> $GITHUB_OUTPUT
@@ -57,37 +69,4 @@ jobs:
             -f ./Docker/Dockerfile ./Docker
 
       - name: Trivy scan (local image)
-        run: trivy image --no-progress --exit-code 1 --severity HIGH,CRITICAL gatus-project:latest
-
-
-      - name: Push Docker image to ECR
-        env:
-          ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
-          REGION:  ${{ secrets.AWS_REGION }}
-          TAG:     ${{ steps.vars.outputs.IMAGE_TAG }}
-        run: |
-          REPO="$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/gatus-project"
-          docker tag gatus-project:latest "$REPO:latest"
-          docker tag gatus-project:latest "$REPO:$TAG"
-          docker push "$REPO:latest"
-          docker push "$REPO:$TAG"
-
-      - name: Install Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.8.5
-
-      - name: Terraform Init
-        working-directory: ./terraform
-        run: terraform init
-
-      - name: Terraform Apply
-        working-directory: ./terraform
-        env:
-          TF_VAR_vpc_id:               ${{ secrets.TF_VAR_VPC_ID }}
-          TF_VAR_subnets_id_list:      ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}  
-          TF_VAR_image_url:            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}
-        run: terraform apply -auto-approve -input=false
-
-      - name: Wait for ECS service stable
-        run: aws ecs wait services-stable --cluster gatus-cluster --services gatus-service
+        run: trivy image --no-progress --exit-co
