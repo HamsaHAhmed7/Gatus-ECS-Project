@@ -32,7 +32,7 @@ https://gatus.hamsa-ahmed.co.uk/
 
 ## 📽 Live Demo Video
 
-https://github.com/HamsaHAhmed7/Gatus-ECS-Project/blob/main/docs/gatus-live-demo.mp4
+[Click here to watch the live demo](docs/gatus-live-demo.mp4)
 
 ---
 
