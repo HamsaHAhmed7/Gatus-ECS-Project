@@ -72,7 +72,7 @@ components/
 ct.yaml
 docker/
 docker-compose.override.*
-docs/
+# docs/
 dojo/
 fixture-updater/
 helm/
