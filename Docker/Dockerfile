@@ -1,5 +1,5 @@
 # official Gatus image
-FROM twinproduction/gatus:latest
+FROM twinproduction/gatus:v5.21.0
 
 # Copy config file into the container
 COPY config.yaml /config/config.yaml
