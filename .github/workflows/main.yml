@@ -63,3 +63,6 @@ jobs:
           TF_VAR_subnets_id_list:      ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}  
           TF_VAR_image_url:            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}
         run: terraform apply -auto-approve -input=false
+
+      - name: Wait for ECS service stable
+        run: aws ecs wait services-stable --cluster gatus-cluster --services gatus-service

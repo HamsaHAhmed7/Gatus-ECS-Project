@@ -19,9 +19,7 @@ resource "aws_ecs_service" "this" {
     container_port   = var.container_port
   }
 
-  lifecycle {
-    ignore_changes = [task_definition] # So you can update it separately
-  }
+
 
   depends_on = [
     var.target_group_arn
