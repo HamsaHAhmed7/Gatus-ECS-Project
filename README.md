@@ -69,58 +69,57 @@ https://gatus.hamsa-ahmed.co.uk/
 
 ```
 Gatus-ECS-Project/
-├── .github
+├── .github                        # GitHub Actions automation workflows
 │   └── workflows
-│       ├── apply.yml
-│       ├── deploy.yml
-│       └── destroy.yml
-├── .gitignore
-├── Docker
-│   ├── Dockerfile
-│   ├── config.yaml
-│   └── docker-compose.yaml
-├── README.md
-├── terraform
-│   ├── backend.tf
-│   ├── main.tf
-│   ├── outputs.tf
-│   ├── variables.tf
-│   └── modules
-│       ├── acm
+│       ├── apply.yml              # Manual Terraform apply workflow
+│       ├── deploy.yml             # CI/CD pipeline for build & deploy
+│       └── destroy.yml            # Manual Terraform destroy workflow
+├── .gitignore                     # Git ignore rules for Terraform state, etc.
+├── Docker                         # Docker build context for Gatus
+│   ├── Dockerfile                 # Multi-stage Docker build for Gatus
+│   ├── config.yaml                # Gatus monitoring configuration
+│   └── docker-compose.yaml        # Local development/testing config
+├── README.md                      # Project documentation
+├── terraform                      # Infrastructure as Code root
+│   ├── backend.tf                  # Remote backend configuration (S3/DynamoDB)
+│   ├── main.tf                     # Main Terraform entrypoint
+│   ├── outputs.tf                  # Outputs for infrastructure resources
+│   ├── variables.tf                # Global variable definitions
+│   └── modules                     # Modular Terraform components
+│       ├── acm                     # ACM TLS certificate provisioning
 │       │   ├── main.tf
 │       │   ├── outputs.tf
 │       │   └── variables.tf
-│       ├── alb
+│       ├── alb                     # Application Load Balancer setup
 │       │   ├── main.tf
 │       │   ├── outputs.tf
 │       │   └── variables.tf
-│       ├── ecs-cluster
+│       ├── ecs-cluster             # ECS cluster configuration
 │       │   ├── main.tf
 │       │   ├── outputs.tf
 │       │   └── variable.tf
-│       ├── ecs-service
+│       ├── ecs-service             # ECS Fargate service definition
 │       │   ├── main.tf
 │       │   ├── outputs.tf
 │       │   └── variables.tf
-│       ├── ecs-task
+│       ├── ecs-task                # ECS task definition & container settings
 │       │   ├── main.tf
 │       │   ├── outputs.tf
 │       │   └── variables.tf
-│       ├── iam
+│       ├── iam                     # IAM roles & permissions for ECS
 │       │   ├── main.tf
 │       │   ├── outputs.tf
 │       │   └── variables.tf
-│       ├── route53
+│       ├── route53                 # DNS records for domain pointing
 │       │   ├── main.tf
 │       │   ├── outputs.tf
 │       │   └── variables.tf
-│       └── sg
+│       └── sg                      # Security groups for ALB & ECS
 │           ├── main.tf
 │           ├── outputs.tf
 │           └── variable.tf
 ```
 
----
 
 ## CI/CD Workflow
 
