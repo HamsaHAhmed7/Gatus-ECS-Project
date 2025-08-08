@@ -182,3 +182,37 @@ This setup demonstrates real-world AWS DevOps deployment practices:
 - **Modular IaC** with Terraform
 - **TLS encryption** for all traffic
 - **Fully reproducible infrastructure**
+
+---
+
+## 📸 Screenshots
+
+### 1. Gatus Live App
+Custom domain with HTTPS and active uptime monitoring checks.  
+![Gatus UI](docs/gatus-ui.png)
+
+---
+
+### 2. Terraform Apply
+Automated infrastructure creation via GitHub Actions workflow.  
+![Terraform Apply](docs/terraform-apply.png)
+
+---
+
+### 3. Terraform Deploy
+Deployment pipeline pushing Docker image to ECR and updating ECS service.  
+![Terraform Deploy](docs/terraform-deploy.png)
+
+---
+
+### 4. Terraform Destroy
+Automated teardown of AWS infrastructure using GitHub Actions.  
+![Terraform Destroy](docs/terraform-destroy.png)
+
+---
+
+### 5. AWS ECS Cluster
+ECS Cluster running Gatus tasks in private subnets, behind an ALB.  
+![AWS ECS Cluster](docs/aws-ecs-cluster.png)
+
+---
