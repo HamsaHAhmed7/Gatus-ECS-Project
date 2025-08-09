@@ -100,3 +100,5 @@ jobs:
             --task-definition gatus-task \
             --force-new-deployment \
             --region ${{ secrets.AWS_REGION }}
+
+#
