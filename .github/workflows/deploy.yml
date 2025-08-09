@@ -93,21 +93,24 @@ jobs:
 
     
       - name: Update ECS task definition with commit SHA
-  run: |
-    TASK_DEF=$(aws ecs describe-task-definition \
-      --task-definition gatus-task \
-      --query taskDefinition)
+        run: |
+          TASK_DEF=$(aws ecs describe-task-definition \
+          --task-definition gatus-task \
+          --query taskDefinition \
+          --region ${{ secrets.AWS_REGION }})
 
-    echo "$TASK_DEF" \
-      | jq --arg IMAGE "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}" \
-        '.containerDefinitions[0].image = $IMAGE' \
-      | jq 'del(.status, .revision, .taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
-      > new-task-def.json
+          echo "$TASK_DEF" \
+          | jq --arg IMAGE "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}" \
+          '.containerDefinitions[0].image = $IMAGE' \
+           | jq 'del(.status, .revision, .taskDefinitionArn, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+          > new-task-def.json
 
-    aws ecs register-task-definition --cli-input-json file://new-task-def.json
+          aws ecs register-task-definition \
+         --cli-input-json file://new-task-def.json \
+           --region ${{ secrets.AWS_REGION }}
 
-    aws ecs update-service \
-      --cluster gatus-cluster \
-      --service gatus-service \
-      --task-definition gatus-task \
-      --region ${{ secrets.AWS_REGION }}
+          aws ecs update-service \
+           --cluster gatus-cluster \
+          --service gatus-service \
+          --task-definition gatus-task \
+          --region ${{ secrets.AWS_REGION }}
