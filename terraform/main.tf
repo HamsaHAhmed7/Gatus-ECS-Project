@@ -31,7 +31,7 @@ module "ecs_task" {
   family             = "gatus-task"
   execution_role_arn = module.iam.execution_role_arn
   task_role_arn      = null
-  image_url          = var.image_url   # <— now driven by CI
+  image_url          = var.image_url  
   aws_region         = "eu-west-2"
 }
 
@@ -69,6 +69,6 @@ module "dns" {
   domain_name    = "gatus.hamsa-ahmed.co.uk"
   hosted_zone_id = "Z07385433QNXDZZ6RBE0E"
   alb_dns_name   = module.alb.alb_dns_name
-  alb_zone_id    = module.alb.alb_zone_id # <-- this only works after fix 1
+  alb_zone_id    = module.alb.alb_zone_id 
 }
 
