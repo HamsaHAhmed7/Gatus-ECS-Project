@@ -25,7 +25,6 @@ jobs:
             | docker login --username AWS --password-stdin \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
-      
       - name: Install TFLint
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
@@ -45,7 +44,7 @@ jobs:
       - name: Lint Dockerfile
         run: hadolint Docker/Dockerfile
 
-      
+
       - name: Cache Trivy DB
         uses: actions/cache@v4
         with:
@@ -65,29 +64,39 @@ jobs:
         id: vars
         run: echo "IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-12)" >> $GITHUB_OUTPUT
 
-      
+    
       - name: Build Docker image
         run: |
           docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }} \
                        -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest \
                        -f ./Docker/Dockerfile ./Docker
 
-    
+      
       - name: Trivy scan (local image)
         run: trivy image --no-progress --severity HIGH,CRITICAL \
              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }} || echo "Trivy found issues (non-blocking)"
 
-      
+  
       - name: Push Docker images
         run: |
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest
 
-     
-      - name: Update ECS service with new image
+      
+      - name: Register new ECS task definition
+        run: |
+          TASK_DEF=$(aws ecs describe-task-definition --task-definition gatus-task)
+          NEW_TASK_DEF=$(echo $TASK_DEF | jq --arg IMAGE "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}" \
+            '.taskDefinition | .containerDefinitions[0].image=$IMAGE | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+          echo "$NEW_TASK_DEF" > new-task-def.json
+          aws ecs register-task-definition --cli-input-json file://new-task-def.json
+
+    
+      - name: Update ECS service with new task definition
         run: |
           aws ecs update-service \
             --cluster gatus-cluster \
             --service gatus-service \
+            --task-definition gatus-task \
             --force-new-deployment \
             --region ${{ secrets.AWS_REGION }}
