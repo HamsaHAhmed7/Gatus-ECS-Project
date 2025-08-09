@@ -28,13 +28,6 @@ It incorporates:
 
 ![ECS Architecture](docs/gatus2.drawio.png)
 
----
-
-## Live Demo
-
-https://gatus.hamsa-ahmed.co.uk/
-
----
 
 ---
 
