@@ -25,7 +25,7 @@ jobs:
             | docker login --username AWS --password-stdin \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
-
+      
       - name: Install TFLint
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
@@ -35,7 +35,7 @@ jobs:
         working-directory: ./terraform
         run: tflint --recursive || echo "tflint found issues (non-blocking)"
 
-     
+    
       - name: Install Hadolint
         run: |
           wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64
@@ -45,6 +45,7 @@ jobs:
       - name: Lint Dockerfile
         run: hadolint Docker/Dockerfile
 
+      
       - name: Cache Trivy DB
         uses: actions/cache@v4
         with:
@@ -59,16 +60,34 @@ jobs:
           sudo mv trivy /usr/local/bin/
           trivy --version
 
-
+     
       - name: Set image tag
         id: vars
         run: echo "IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-12)" >> $GITHUB_OUTPUT
 
+      
       - name: Build Docker image
         run: |
-          docker build -t gatus-project:latest \
-            -f ./Docker/Dockerfile ./Docker
+          docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }} \
+                       -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest \
+                       -f ./Docker/Dockerfile ./Docker
 
+    
       - name: Trivy scan (local image)
-        run: trivy image --no-progress --severity HIGH,CRITICAL gatus-project:latest || echo "Trivy found issues (non-blocking)"
+        run: trivy image --no-progress --severity HIGH,CRITICAL \
+             ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }} || echo "Trivy found issues (non-blocking)"
 
+      
+      - name: Push Docker images
+        run: |
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest
+
+     
+      - name: Update ECS service with new image
+        run: |
+          aws ecs update-service \
+            --cluster gatus-cluster \
+            --service gatus-service \
+            --force-new-deployment \
+            --region ${{ secrets.AWS_REGION }}
