@@ -26,6 +26,7 @@ crash.log
 override.tf
 override.tf.json
 .plan
+.terraform.lock.hcl 
 
 # AWS Credentials (if mistakenly created)
 .aws/
