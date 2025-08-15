@@ -88,6 +88,7 @@ docker run -p 8080:8080 gatus-local
 
 ## Directory Layout
 
+```bash
 .
 ├── Docker
 │   ├── Dockerfile
@@ -110,7 +111,7 @@ docker run -p 8080:8080 gatus-local
 │   ├── outputs.tf
 │   ├── terraform.tfvars
 │   └── variables.tf
-
+```
 ---
 
 ## CI/CD Workflow – Secure Deployment Pipeline
