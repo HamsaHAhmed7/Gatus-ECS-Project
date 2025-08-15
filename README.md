@@ -100,43 +100,16 @@ docker run -p 8080:8080 gatus-local
 │   ├── main.tf
 │   ├── modules
 │   │   ├── acm
-│   │   │   ├── main.tf
-│   │   │   ├── outputs.tf
-│   │   │   └── variables.tf
 │   │   ├── alb
-│   │   │   ├── main.tf
-│   │   │   ├── outputs.tf
-│   │   │   └── variables.tf
 │   │   ├── ecs-cluster
-│   │   │   ├── main.tf
-│   │   │   ├── outputs.tf
-│   │   │   └── variable.tf
 │   │   ├── ecs-service
-│   │   │   ├── main.tf
-│   │   │   ├── outputs.tf
-│   │   │   └── variables.tf
 │   │   ├── ecs-task
-│   │   │   ├── main.tf
-│   │   │   ├── outputs.tf
-│   │   │   └── variables.tf
 │   │   ├── iam
-│   │   │   ├── main.tf
-│   │   │   ├── outputs.tf
-│   │   │   └── variables.tf
 │   │   ├── route53
-│   │   │   ├── main.tf
-│   │   │   ├── outputs.tf
-│   │   │   └── variables.tf
 │   │   └── sg
-│   │       ├── main.tf
-│   │       ├── outputs.tf
-│   │       └── variable.tf
 │   ├── outputs.tf
-│   ├── terraform.tfstate
-│   ├── terraform.tfstate.backup
 │   ├── terraform.tfvars
 │   └── variables.tf
-└── terraform.tfstate
 
 ---
 
