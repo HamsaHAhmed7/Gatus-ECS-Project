@@ -63,17 +63,6 @@ docker run -p 8080:8080 gatus-local
 
 ---
 
-## Why This Project?
-
-This setup demonstrates real-world AWS DevOps deployment practices:
-
-- **Secure networking** with private subnets
-- **Automated builds** and deployments
-- **Modular IaC** with Terraform
-- **TLS encryption** for all traffic
-- **Automated linting & security scans**
-- **Fully reproducible infrastructure**
----
 
 ## Technologies Used
 
@@ -99,58 +88,55 @@ This setup demonstrates real-world AWS DevOps deployment practices:
 
 ## Directory Layout
 
-```
-Gatus-ECS-Project/
-├── .github                        # GitHub Actions automation workflows
-│   └── workflows
-│       ├── apply.yml              # Manual Terraform apply workflow
-│       ├── deploy.yml             # CI/CD pipeline for build & deploy
-│       └── destroy.yml            # Manual Terraform destroy workflow
-├── .gitignore                     # Git ignore rules for Terraform state, etc.
-├── Docker                         # Docker build context for Gatus
-│   ├── Dockerfile                 # Multi-stage Docker build for Gatus
-│   ├── config.yaml                # Gatus monitoring configuration
-│   └── docker-compose.yaml        # Local development/testing config
-├── README.md                      # Project documentation
-├── terraform                      # Infrastructure as Code root
-│   ├── backend.tf                  # Remote backend configuration (S3/DynamoDB)
-│   ├── main.tf                     # Main Terraform entrypoint
-│   ├── outputs.tf                  # Outputs for infrastructure resources
-│   ├── variables.tf                # Global variable definitions
-│   └── modules                     # Modular Terraform components
-│       ├── acm                     # ACM TLS certificate provisioning
-│       │   ├── main.tf
-│       │   ├── outputs.tf
-│       │   └── variables.tf
-│       ├── alb                     # Application Load Balancer setup
-│       │   ├── main.tf
-│       │   ├── outputs.tf
-│       │   └── variables.tf
-│       ├── ecs-cluster             # ECS cluster configuration
-│       │   ├── main.tf
-│       │   ├── outputs.tf
-│       │   └── variable.tf
-│       ├── ecs-service             # ECS Fargate service definition
-│       │   ├── main.tf
-│       │   ├── outputs.tf
-│       │   └── variables.tf
-│       ├── ecs-task                # ECS task definition & container settings
-│       │   ├── main.tf
-│       │   ├── outputs.tf
-│       │   └── variables.tf
-│       ├── iam                     # IAM roles & permissions for ECS
-│       │   ├── main.tf
-│       │   ├── outputs.tf
-│       │   └── variables.tf
-│       ├── route53                 # DNS records for domain pointing
-│       │   ├── main.tf
-│       │   ├── outputs.tf
-│       │   └── variables.tf
-│       └── sg                      # Security groups for ALB & ECS
-│           ├── main.tf
-│           ├── outputs.tf
-│           └── variable.tf
-```
+.
+├── Docker
+│   ├── Dockerfile
+│   ├── config.yaml
+│   └── docker-compose.yaml
+├── README.md
+├── docs
+├── terraform
+│   ├── backend.tf
+│   ├── main.tf
+│   ├── modules
+│   │   ├── acm
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── alb
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── ecs-cluster
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variable.tf
+│   │   ├── ecs-service
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── ecs-task
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── iam
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── route53
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   └── sg
+│   │       ├── main.tf
+│   │       ├── outputs.tf
+│   │       └── variable.tf
+│   ├── outputs.tf
+│   ├── terraform.tfstate
+│   ├── terraform.tfstate.backup
+│   ├── terraform.tfvars
+│   └── variables.tf
+└── terraform.tfstate
 
 ---
 
