@@ -98,4 +98,4 @@ wsgi_params/
 .terraform/
 *.tfstate
 
-.terraform.lock.hcl
+*.terraform.lock.hcl
