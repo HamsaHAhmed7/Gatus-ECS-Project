@@ -99,3 +99,10 @@ wsgi_params/
 *.tfstate
 
 *.terraform.lock.hcl
+# Terraform
+.terraform/
+**/.terraform/
+.terraform.lock.hcl
+**/.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
