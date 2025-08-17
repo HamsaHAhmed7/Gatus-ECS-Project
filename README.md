@@ -26,7 +26,7 @@ It incorporates:
 ---
 ## Architecture Diagram
 
-![ECS Architecture](docs/gatus2.drawio.png)
+![ECS Architecture](docs/gatus2new-Page-2.drawio.png)
 
 
 ---
@@ -60,20 +60,6 @@ docker build -t gatus-local -f Docker/Dockerfile Docker/
 # 3. Run locally
 docker run -p 8080:8080 gatus-local
 ```
-
----
-
-
-## Technologies Used
-
-| Category       | Tools/Services                             |
-|----------------|---------------------------------------------|
-| **Cloud**      | AWS ECS (Fargate), ALB, ECR, ACM, VPC, Route 53 |
-| **IaC**        | Terraform (modular)                         |
-| **CI/CD**      | GitHub Actions                              |
-| **Security**   | ACM TLS, IAM Roles, Security Groups, Trivy   |
-| **Linting**    | TFLint, Hadolint                             |
-| **Container**  | Docker                                      |
 
 ---
 
