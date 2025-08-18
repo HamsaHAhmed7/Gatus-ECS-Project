@@ -1,33 +1,82 @@
-name: Destroy Infrastructure
-on: { workflow_dispatch: {} }
+name: Security Scan & Plan
 
-permissions:
-  id-token: write
-  contents: read
+on:
+  pull_request:
+    branches: [ main ]
+    paths: 
+      - 'terraform/**'
+      - 'Docker/**'
+      - '.github/workflows/**'
+  push:
+    branches: [ main ]
+    paths:
+      - 'terraform/**'
+      - 'Docker/**'
 
 jobs:
-  destroy:
+  security-scan:
     runs-on: ubuntu-latest
-    environment: production  
     steps:
-      - uses: actions/checkout@v3
-      - uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ secrets.AWS_REGION }}
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - uses: hashicorp/setup-terraform@v2
-        with: { terraform_version: 1.8.5 }
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.8.5
 
       - name: Terraform init
         working-directory: ./terraform
         run: terraform init
 
-      - name: Terraform destroy
+      - name: Run tfsec
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: terraform
+          soft_fail: false
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: terraform
+          framework: terraform
+          soft_fail: false
+
+      - name: Install TFLint
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+
+      - name: Run TFLint
+        working-directory: ./terraform
+        run: tflint --recursive
+
+      - name: Terraform plan
         working-directory: ./terraform
         env:
-          TF_VAR_vpc_id:          ${{ secrets.TF_VAR_VPC_ID }}
+          TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
           TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}
-          TF_VAR_image_url: "unused-for-destroy"
-        run: terraform destroy -auto-approve -input=false
+          TF_VAR_image_url: "016873651140.dkr.ecr.eu-west-2.amazonaws.com/gatus-project:latest"
+        run: |
+          terraform plan -out=tfplan
+          terraform show -json tfplan > plan.json
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan
+          path: terraform/plan.json
+          retention-days: 30
+
+      - name: Lint Dockerfile
+        if: contains(github.event.head_commit.modified, 'Docker/') || github.event_name == 'pull_request'
+        run: |
+          wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64
+          chmod +x /usr/local/bin/hadolint
+          hadolint Docker/Dockerfile

@@ -1,0 +1,78 @@
+name: Destroy Infrastructure
+
+on: 
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type "DESTROY" to confirm infrastructure deletion'
+        required: true
+      reason:
+        description: 'Reason for destroying infrastructure'
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Validate confirmation input
+        run: |
+          if [ "${{ github.event.inputs.confirmation }}" != "DESTROY" ]; then
+            echo "ERROR: Confirmation failed. You must type exactly 'DESTROY' to proceed."
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with: 
+          terraform_version: 1.8.5
+
+      - name: Terraform init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Generate destroy plan
+        working-directory: ./terraform
+        env:
+          TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
+          TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}
+          TF_VAR_image_url: "unused-for-destroy"
+        run: terraform plan -destroy -out=destroy.tfplan
+
+      - name: Execute infrastructure destruction
+        working-directory: ./terraform
+        env:
+          TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
+          TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}
+          TF_VAR_image_url: "unused-for-destroy"
+        run: terraform apply destroy.tfplan
+
+      - name: Verify destruction
+        run: |
+          echo "Verifying infrastructure destruction..."
+          
+          if aws ecs describe-clusters --clusters gatus-cluster --query 'clusters[0].status' --output text 2>/dev/null | grep -q "ACTIVE"; then
+            echo "WARNING: ECS cluster still exists"
+          else
+            echo "ECS cluster destroyed successfully"
+          fi
+
+          echo "Destruction Summary:"
+          echo "Timestamp: $(date -u)"
+          echo "Initiated by: ${{ github.actor }}"
+          echo "Reason: ${{ github.event.inputs.reason }}"
