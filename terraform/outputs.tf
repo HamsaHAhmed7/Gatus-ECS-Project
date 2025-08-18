@@ -1,28 +1,41 @@
-output "custom_domain_url" {
-  description = "The custom HTTPS domain for the Gatus app"
-  value       = "https://${module.dns.domain_name}"
+
+
+output "vpc_id" {
+  description = "ID of the VPC"
+  value       = module.vpc.vpc_id
 }
 
-#ALB Outputs
-#output "alb_dns_name" {
-#description = "DNS name of the Application Load Balancer"
-#  value       = module.alb.alb_dns_name
-#}
-
-
-output "ecs_cluster_name" {
-  description = "Name of the ECS Cluster"
-  value       = module.ecs_cluster.cluster_name
+output "public_subnet_ids" {
+  description = "List of public subnet IDs"
+  value       = module.vpc.public_subnet_ids
 }
 
+output "private_subnet_ids" {
+  description = "List of private subnet IDs"
+  value       = module.vpc.private_subnet_ids
+}
+
+output "alb_dns_name" {
+  description = "DNS name of the load balancer"
+  value       = module.alb.alb_dns_name
+}
+
+output "alb_zone_id" {
+  description = "Zone ID of the load balancer"
+  value       = module.alb.alb_zone_id
+}
 
 output "task_definition_arn" {
-  description = "ARN of the ECS Task Definition"
+  description = "ARN of the ECS task definition"
   value       = module.ecs_task.task_definition_arn
 }
 
- 
-output "execution_role_arn" {
-  description = "ARN of the ECS task execution role"
-  value       = module.iam.execution_role_arn
+output "ecs_cluster_id" {
+  description = "ID of the ECS cluster"
+  value       = module.ecs_cluster.cluster_id
+}
+
+output "nat_gateway_public_ips" {
+  description = "Public IP addresses of NAT Gateways"
+  value       = module.vpc.nat_gateway_public_ips
 }
