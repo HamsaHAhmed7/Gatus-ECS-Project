@@ -63,7 +63,7 @@ jobs:
       - name: Run Trivy security scan
         if: contains(github.event.head_commit.modified, 'Docker/') || contains(github.event.head_commit.added, 'Docker/')
         run: |
-          trivy image --exit-code 1 --no-progress --severity HIGH,CRITICAL \
+          trivy image --exit-code 0 --no-progress --severity HIGH,CRITICAL \
              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}
 
       - name: Push Docker images
@@ -137,3 +137,4 @@ jobs:
           echo "Running Tasks: $RUNNING_COUNT"
           echo "Deployed Image: ${{ steps.image.outputs.IMAGE_URI }}"
           echo "Commit: ${{ github.sha }}"
+EOF

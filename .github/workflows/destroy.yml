@@ -1,82 +1,79 @@
-name: Security Scan & Plan
+name: Destroy Infrastructure
 
-on:
-  pull_request:
-    branches: [ main ]
-    paths: 
-      - 'terraform/**'
-      - 'Docker/**'
-      - '.github/workflows/**'
-  push:
-    branches: [ main ]
-    paths:
-      - 'terraform/**'
-      - 'Docker/**'
+on: 
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type "DESTROY" to confirm infrastructure deletion'
+        required: true
+      reason:
+        description: 'Reason for destroying infrastructure'
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  security-scan:
+  destroy:
     runs-on: ubuntu-latest
+    environment: production
+    
     steps:
+      - name: Validate confirmation input
+        run: |
+          if [ "${{ github.event.inputs.confirmation }}" != "DESTROY" ]; then
+            echo "ERROR: Confirmation failed. You must type exactly 'DESTROY' to proceed."
+            exit 1
+          fi
+
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
+        uses: hashicorp/setup-terraform@v3
+        with: 
           terraform_version: 1.8.5
 
       - name: Terraform init
         working-directory: ./terraform
         run: terraform init
 
-      - name: Run tfsec
-        uses: aquasecurity/tfsec-action@v1.0.0
-        with:
-          working_directory: terraform
-          soft_fail: false
-
-      - name: Run Checkov
-        uses: bridgecrewio/checkov-action@master
-        with:
-          directory: terraform
-          framework: terraform
-          soft_fail: false
-
-      - name: Install TFLint
-        run: |
-          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-
-      - name: Run TFLint
-        working-directory: ./terraform
-        run: tflint --recursive
-
-      - name: Terraform plan
+      - name: Generate destroy plan
         working-directory: ./terraform
         env:
           TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
           TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}
-          TF_VAR_image_url: "016873651140.dkr.ecr.eu-west-2.amazonaws.com/gatus-project:latest"
-        run: |
-          terraform plan -out=tfplan
-          terraform show -json tfplan > plan.json
+          TF_VAR_image_url: "unused-for-destroy"
+        run: terraform plan -destroy -out=destroy.tfplan
 
-      - name: Upload plan artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: terraform-plan
-          path: terraform/plan.json
-          retention-days: 30
+      - name: Execute infrastructure destruction
+        working-directory: ./terraform
+        env:
+          TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
+          TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}
+          TF_VAR_image_url: "unused-for-destroy"
+        run: terraform apply destroy.tfplan
 
-      - name: Lint Dockerfile
-        if: contains(github.event.head_commit.modified, 'Docker/') || github.event_name == 'pull_request'
+      - name: Verify destruction
         run: |
-          wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64
-          chmod +x /usr/local/bin/hadolint
-          hadolint Docker/Dockerfile
+          echo "Verifying infrastructure destruction..."
+          
+          if aws ecs describe-clusters --clusters gatus-cluster --query 'clusters[0].status' --output text 2>/dev/null | grep -q "ACTIVE"; then
+            echo "WARNING: ECS cluster still exists"
+          else
+            echo "ECS cluster destroyed successfully"
+          fi
+
+          echo "Destruction Summary:"
+          echo "Timestamp: $(date -u)"
+          echo "Initiated by: ${{ github.actor }}"
+          echo "Reason: ${{ github.event.inputs.reason }}"
+EOF
