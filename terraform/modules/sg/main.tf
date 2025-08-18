@@ -29,7 +29,7 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_security_group" "ecs" {
-  name        = "gatus-ecs-sg"
+  name        = "gatus-ecs-sg-"
   description = "Allow traffic from ALB to ECS tasks on port 8080"
   vpc_id      = var.vpc_id
 
