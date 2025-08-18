@@ -32,28 +32,24 @@ jobs:
         run: echo "IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-12)" >> $GITHUB_OUTPUT
 
       - name: Login to Amazon ECR
-        if: contains(github.event.head_commit.modified, 'Docker/') || contains(github.event.head_commit.added, 'Docker/')
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
             | docker login --username AWS --password-stdin \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
       - name: Build Docker image
-        if: contains(github.event.head_commit.modified, 'Docker/') || contains(github.event.head_commit.added, 'Docker/')
         run: |
           docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }} \
                        -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest \
                        -f ./Docker/Dockerfile ./Docker
 
       - name: Cache Trivy DB
-        if: contains(github.event.head_commit.modified, 'Docker/') || contains(github.event.head_commit.added, 'Docker/')
         uses: actions/cache@v4
         with:
           path: ~/.cache/trivy
           key: trivy-db-${{ runner.os }}-v1
 
       - name: Install Trivy
-        if: contains(github.event.head_commit.modified, 'Docker/') || contains(github.event.head_commit.added, 'Docker/')
         run: |
           TRIVY_VERSION=$(curl -s https://api.github.com/repos/aquasecurity/trivy/releases/latest | grep tag_name | cut -d '"' -f 4)
           wget https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/trivy_${TRIVY_VERSION#v}_Linux-64bit.tar.gz
@@ -61,13 +57,11 @@ jobs:
           sudo mv trivy /usr/local/bin/
 
       - name: Run Trivy security scan
-        if: contains(github.event.head_commit.modified, 'Docker/') || contains(github.event.head_commit.added, 'Docker/')
         run: |
           trivy image --exit-code 0 --no-progress --severity HIGH,CRITICAL \
              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}
 
       - name: Push Docker images
-        if: contains(github.event.head_commit.modified, 'Docker/') || contains(github.event.head_commit.added, 'Docker/')
         run: |
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:${{ steps.vars.outputs.IMAGE_TAG }}
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/gatus-project:latest
@@ -82,19 +76,8 @@ jobs:
           ACCOUNT="${{ secrets.AWS_ACCOUNT_ID }}"
           REGION="${{ secrets.AWS_REGION }}"
           REPO="gatus-project"
-          
-          if [[ "${{ github.event.head_commit.modified }}" == *"Docker/"* ]] || [[ "${{ github.event.head_commit.added }}" == *"Docker/"* ]]; then
-            IMAGE_URI="$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/$REPO:${{ steps.vars.outputs.IMAGE_TAG }}"
-            echo "Deploying newly built image: ${{ steps.vars.outputs.IMAGE_TAG }}"
-          else
-            DIGEST=$(aws ecr describe-images \
-              --repository-name "$REPO" \
-              --query 'reverse(sort_by(imageDetails,& imagePushedAt))[0].imageDigest' \
-              --output text)
-            IMAGE_URI="$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/$REPO@$DIGEST"
-            echo "Using existing latest image for terraform changes"
-          fi
-
+          IMAGE_URI="$ACCOUNT.dkr.ecr.$REGION.amazonaws.com/$REPO:${{ steps.vars.outputs.IMAGE_TAG }}"
+          echo "Deploying newly built image: ${{ steps.vars.outputs.IMAGE_TAG }}"
           echo "IMAGE_URI=$IMAGE_URI" >> "$GITHUB_OUTPUT"
 
       - name: Terraform plan
