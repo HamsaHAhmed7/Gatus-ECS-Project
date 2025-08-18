@@ -137,4 +137,3 @@ jobs:
           echo "Running Tasks: $RUNNING_COUNT"
           echo "Deployed Image: ${{ steps.image.outputs.IMAGE_URI }}"
           echo "Commit: ${{ github.sha }}"
-EOF

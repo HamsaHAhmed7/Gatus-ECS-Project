@@ -76,4 +76,3 @@ jobs:
           echo "Timestamp: $(date -u)"
           echo "Initiated by: ${{ github.actor }}"
           echo "Reason: ${{ github.event.inputs.reason }}"
-EOF
