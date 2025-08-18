@@ -80,13 +80,17 @@ jobs:
           echo "Deploying newly built image: ${{ steps.vars.outputs.IMAGE_TAG }}"
           echo "IMAGE_URI=$IMAGE_URI" >> "$GITHUB_OUTPUT"
 
+      - name: Force unlock stale Terraform lock
+        working-directory: ./terraform
+        run: terraform force-unlock -force b6e069c3-8e9e-e934-d791-f2b05d4c2377 || true
+
       - name: Terraform plan
         working-directory: ./terraform
         env:
           TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
           TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}
           TF_VAR_image_url: ${{ steps.image.outputs.IMAGE_URI }}
-        run: terraform plan -out=tfplan
+        run: terraform plan -lock-timeout=60s -out=tfplan
 
       - name: Terraform apply
         working-directory: ./terraform
@@ -94,7 +98,7 @@ jobs:
           TF_VAR_vpc_id: ${{ secrets.TF_VAR_VPC_ID }}
           TF_VAR_subnets_id_list: ${{ secrets.TF_VAR_SUBNETS_ID_LIST }}
           TF_VAR_image_url: ${{ steps.image.outputs.IMAGE_URI }}
-        run: terraform apply tfplan
+        run: terraform apply -lock-timeout=60s tfplan
 
       - name: Wait for ECS service stability
         run: |
