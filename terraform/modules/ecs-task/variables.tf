@@ -29,7 +29,7 @@ variable "container_port" {
 variable "cpu" {
   description = "CPU units for the container"
   type        = number
-  default     = 256 
+  default     = 256
 }
 
 variable "memory" {
