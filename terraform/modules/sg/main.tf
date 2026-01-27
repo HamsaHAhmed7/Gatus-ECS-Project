@@ -1,7 +1,7 @@
 resource "aws_security_group" "alb" {
   name        = "gatus-alb-sg"
   description = "Allow HTTP/HTTPS to ALB"
-  vpc_id      = var.vpc_id 
+  vpc_id      = var.vpc_id
 
   ingress {
     description = "HTTP from anywhere"
