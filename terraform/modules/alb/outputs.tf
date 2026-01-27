@@ -16,4 +16,3 @@ output "alb_arn" {
 output "alb_zone_id" {
   value = aws_lb.gatus_alb.zone_id
 }
-
