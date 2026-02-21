@@ -1,0 +1,112 @@
+endpoints:
+  - name: GitHub
+    group: Dev Essentials
+    url: "https://github.com"
+    interval: 2m
+    conditions:
+      - "[STATUS] == 200"
+      - "[RESPONSE_TIME] < 500"
+
+  - name: Stack Overflow
+    group: Dev Essentials
+    url: "https://stackoverflow.com"
+    interval: 3m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: Docker Hub
+    group: Dev Essentials
+    url: "https://hub.docker.com"
+    interval: 3m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: AWS Console
+    group: Cloud
+    url: "https://console.aws.amazon.com"
+    interval: 2m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: Terraform Registry
+    group: Infrastructure
+    url: "https://registry.terraform.io"
+    interval: 5m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: PyPI
+    group: Package Managers
+    url: "https://pypi.org"
+    interval: 5m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: NPM
+    group: Package Managers
+    url: "https://www.npmjs.com"
+    interval: 5m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: Reddit
+    group: Social
+    url: "https://www.reddit.com"
+    interval: 5m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: Hacker News
+    group: Tech News
+    url: "https://news.ycombinator.com"
+    interval: 3m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: YouTube
+    group: Media
+    url: "https://www.youtube.com"
+    interval: 5m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: Spotify Web
+    group: Media
+    url: "https://open.spotify.com"
+    interval: 5m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: BBC
+    group: News
+    url: "https://www.bbc.co.uk"
+    interval: 5m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: Cloudflare DNS
+    group: Network
+    url: "1.1.1.1"
+    interval: 1m
+    dns:
+      query-name: "google.com"
+      query-type: "A"
+    conditions:
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: Google DNS
+    group: Network
+    url: "8.8.8.8"
+    interval: 1m
+    dns:
+      query-name: "github.com"
+      query-type: "A"
+    conditions:
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: Cloudflare Ping
+    group: Network
+    url: "icmp://1.1.1.1"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
