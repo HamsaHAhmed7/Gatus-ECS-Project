@@ -1,4 +1,4 @@
-image_url = "016873651140.dkr.ecr.eu-west-2.amazonaws.com/gatus-project:latest"
+image_url = "016873651140.dkr.ecr.eu-west-2.amazonaws.com/gatus-project"
 
 project_name = "gatus"
 environment  = "production"
