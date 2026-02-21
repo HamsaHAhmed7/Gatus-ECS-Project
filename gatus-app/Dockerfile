@@ -11,7 +11,7 @@ FROM scratch
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /build/gatus /gatus
 COPY --from=builder /build/web /web
-COPY --from=builder /build/config.yaml /config.yaml
+COPY --from=builder /build/config.yaml /config/config.yaml
 
 ENV PORT=8080
 EXPOSE 8080
