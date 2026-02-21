@@ -481,7 +481,7 @@ func (s *Store) UpsertTriggeredEndpointAlert(ep *endpoint.Endpoint, triggeredAle
 	}
 	_, err = tx.Exec(
 		`
-			INSERT INTO endpoint_alerts_triggered (endpoint_id, configuration_checksum, resolve_key, number_of_successes_in_a_row) 
+			INSERT INTO endpoint_alerts_triggered (endpoint_id, configuration_checksum, resolve_key, number_of_successes_in_a_row)
 			VALUES ($1, $2, $3, $4)
 			ON CONFLICT(endpoint_id, configuration_checksum) DO UPDATE SET
 				resolve_key = $3,
@@ -524,7 +524,7 @@ func (s *Store) DeleteAllTriggeredAlertsNotInChecksumsByEndpoint(ep *endpoint.En
 	} else {
 		args := make([]interface{}, 0, len(checksums)+1)
 		args = append(args, ep.Key())
-		query := `DELETE FROM endpoint_alerts_triggered 
+		query := `DELETE FROM endpoint_alerts_triggered
 			WHERE endpoint_id = (SELECT endpoint_id FROM endpoints WHERE endpoint_key = $1 LIMIT 1)
 			  AND configuration_checksum NOT IN (`
 		for i := range checksums {
@@ -670,7 +670,7 @@ func (s *Store) updateEndpointUptime(tx *sql.Tx, endpointID int64, result *endpo
 	}
 	_, err := tx.Exec(
 		`
-			INSERT INTO endpoint_uptimes (endpoint_id, hour_unix_timestamp, total_executions, successful_executions, total_response_time) 
+			INSERT INTO endpoint_uptimes (endpoint_id, hour_unix_timestamp, total_executions, successful_executions, total_response_time)
 			VALUES ($1, $2, $3, $4, $5)
 			ON CONFLICT(endpoint_id, hour_unix_timestamp) DO UPDATE SET
 				total_executions = excluded.total_executions + endpoint_uptimes.total_executions,
@@ -691,7 +691,7 @@ func (s *Store) getAllEndpointKeys(tx *sql.Tx) (keys []string, err error) {
 	// This excludes endpoints that only exist as part of suites
 	// Using JOIN for better performance than EXISTS subquery
 	rows, err := tx.Query(`
-		SELECT DISTINCT e.endpoint_key 
+		SELECT DISTINCT e.endpoint_key
 		FROM endpoints e
 		INNER JOIN endpoint_results er ON e.endpoint_id = er.endpoint_id
 		WHERE er.suite_result_id IS NULL
@@ -967,9 +967,9 @@ func (s *Store) getNumberOfUptimeEntriesByEndpointID(tx *sql.Tx, endpointID int6
 func (s *Store) getAgeOfOldestEndpointUptimeEntry(tx *sql.Tx, endpointID int64) (time.Duration, error) {
 	rows, err := tx.Query(
 		`
-			SELECT hour_unix_timestamp 
-			FROM endpoint_uptimes 
-			WHERE endpoint_id = $1 
+			SELECT hour_unix_timestamp
+			FROM endpoint_uptimes
+			WHERE endpoint_id = $1
 			ORDER BY hour_unix_timestamp
 			LIMIT 1
 		`,
@@ -1006,10 +1006,10 @@ func (s *Store) getLastEndpointResultSuccessValue(tx *sql.Tx, endpointID int64) 
 func (s *Store) deleteOldEndpointEvents(tx *sql.Tx, endpointID int64) error {
 	_, err := tx.Exec(
 		`
-			DELETE FROM endpoint_events 
+			DELETE FROM endpoint_events
 			WHERE endpoint_id = $1
 				AND endpoint_event_id NOT IN (
-					SELECT endpoint_event_id 
+					SELECT endpoint_event_id
 					FROM endpoint_events
 					WHERE endpoint_id = $1
 					ORDER BY endpoint_event_id DESC
@@ -1027,7 +1027,7 @@ func (s *Store) deleteOldEndpointResults(tx *sql.Tx, endpointID int64) error {
 	_, err := tx.Exec(
 		`
 			DELETE FROM endpoint_results
-			WHERE endpoint_id = $1 
+			WHERE endpoint_id = $1
 				AND endpoint_result_id NOT IN (
 					SELECT endpoint_result_id
 					FROM endpoint_results
@@ -1612,7 +1612,7 @@ func (s *Store) getNumberOfSuiteResultsByID(tx *sql.Tx, suiteID int64) (int64, e
 func (s *Store) deleteOldSuiteResults(tx *sql.Tx, suiteID int64) error {
 	_, err := tx.Exec(`
 		DELETE FROM suite_results
-		WHERE suite_id = $1 
+		WHERE suite_id = $1
 			AND suite_result_id NOT IN (
 				SELECT suite_result_id
 				FROM suite_results

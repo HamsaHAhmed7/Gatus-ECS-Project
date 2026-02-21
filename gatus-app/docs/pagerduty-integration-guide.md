@@ -33,7 +33,7 @@ If you need help with this integration, please create an issue at https://github
 In your configuration file, you must first specify the integration key at `alerting.pagerduty.integration-key`, like so:
 ```yaml
 alerting:
-  pagerduty: 
+  pagerduty:
     integration-key: "********************************"
 ```
 You can now add alerts of type `pagerduty` in the endpoint you've defined, like so:

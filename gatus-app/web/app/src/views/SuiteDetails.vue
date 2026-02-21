@@ -7,7 +7,7 @@
           <ArrowLeft class="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
-        
+
         <div class="flex items-start justify-between">
           <div>
             <h1 class="text-3xl font-bold tracking-tight">{{ suite?.name || 'Loading...' }}</h1>
@@ -130,7 +130,7 @@
     </div>
 
     <Settings @refreshData="fetchData" />
-    
+
     <!-- Step Details Modal -->
     <StepDetailsModal
       v-if="selectedStep"
@@ -243,7 +243,7 @@ const calculateSuccessRate = (result) => {
   if (!result || !result.endpointResults || result.endpointResults.length === 0) {
     return 0
   }
-  
+
   const successful = result.endpointResults.filter(e => e.success).length
   return Math.round((successful / result.endpointResults.length) * 100)
 }

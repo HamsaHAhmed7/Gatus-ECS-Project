@@ -261,13 +261,13 @@ func TestAlertProvider_BuildRequestBody(t *testing.T) {
 				},
 				scenario.Resolved,
 			)
-			
+
 			// Parse the JSON body
 			var parsedBody Body
 			if err := json.Unmarshal(body, &parsedBody); err != nil {
 				t.Error("expected body to be valid JSON, got error:", err.Error())
 			}
-			
+
 			// Validate individual fields
 			if parsedBody.AlertSourceConfigID != scenario.ExpectedAlertSourceID {
 				t.Errorf("expected alert_source_config_id to be %s, got %s", scenario.ExpectedAlertSourceID, parsedBody.AlertSourceConfigID)

@@ -6,7 +6,7 @@
           <ArrowLeft class="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
-        
+
         <div v-if="endpointStatus && endpointStatus.name" class="space-y-6">
           <div class="flex items-start justify-between">
             <div>
@@ -63,8 +63,8 @@
               <div class="flex items-center justify-between">
                 <CardTitle>Recent Checks</CardTitle>
                 <div class="flex items-center gap-2">
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="icon"
                     @click="toggleShowAverageResponseTime"
                     :title="showAverageResponseTime ? 'Show min-max response time' : 'Show average response time'"
@@ -72,9 +72,9 @@
                     <Activity v-if="showAverageResponseTime" class="h-5 w-5" />
                     <Timer v-else class="h-5 w-5" />
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     @click="fetchData"
                     title="Refresh data"
                     :disabled="isRefreshing"
@@ -86,7 +86,7 @@
             </CardHeader>
             <CardContent>
               <div class="space-y-4">
-                <EndpointCard 
+                <EndpointCard
                   v-if="endpointStatus"
                   :endpoint="endpointStatus"
                   :maxResults="resultPageSize"
@@ -106,7 +106,7 @@
               <CardHeader>
                 <div class="flex items-center justify-between">
                   <CardTitle>Response Time Trend</CardTitle>
-                  <select 
+                  <select
                     v-model="selectedChartDuration"
                     class="text-sm bg-background border rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-ring"
                   >
@@ -275,7 +275,7 @@ const pageResponseTimeRange = computed(() => {
   let min = Infinity
   let max = 0
   let hasData = false
-  
+
   for (const result of endpointStatus.value.results) {
     const duration = result.duration
     if (duration) {
@@ -284,7 +284,7 @@ const pageResponseTimeRange = computed(() => {
       hasData = true
     }
   }
-  
+
   if (!hasData) return 'N/A'
   const minMs = Math.trunc(min / 1000000)
   const maxMs = Math.trunc(max / 1000000)
@@ -310,16 +310,16 @@ const fetchData = async () => {
     const response = await fetch(`/api/v1/endpoints/${route.params.key}/statuses?page=${currentPage.value}&pageSize=${resultPageSize}`, {
       credentials: 'include'
     })
-    
+
     if (response.status === 200) {
       const data = await response.json()
       endpointStatus.value = data
-      
+
       // Always update currentStatus when on page 1 (including when returning to it)
       if (currentPage.value === 1) {
         currentStatus.value = data
       }
-      
+
       let processedEvents = []
       if (data.events && data.events.length > 0) {
         for (let i = data.events.length - 1; i >= 0; i--) {
@@ -351,7 +351,7 @@ const fetchData = async () => {
         }
       }
       events.value = processedEvents
-      
+
       if (data.results && data.results.length > 0) {
         for (let i = 0; i < data.results.length; i++) {
           if (data.results[i].duration > 0) {

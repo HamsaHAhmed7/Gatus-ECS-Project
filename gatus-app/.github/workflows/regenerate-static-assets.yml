@@ -66,7 +66,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           echo "Changes detected. Committing and pushing..."
-          git add . 
+          git add .
           git commit -m "chore(ui): Regenerate static assets"
           git push origin ${{ steps.pr.outputs.ref }}
           echo "status=success" >> $GITHUB_OUTPUT

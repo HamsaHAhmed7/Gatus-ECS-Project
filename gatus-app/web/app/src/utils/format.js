@@ -5,10 +5,10 @@
  */
 export const formatDuration = (duration) => {
   if (!duration && duration !== 0) return 'N/A'
-  
+
   // Convert nanoseconds to milliseconds
   const durationMs = duration / 1000000
-  
+
   if (durationMs < 1000) {
     return `${Math.trunc(durationMs)}ms`
   } else {
