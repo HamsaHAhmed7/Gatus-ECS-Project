@@ -26,10 +26,14 @@ resource "aws_security_group" "alb" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "gatus-alb-sg"
+  }
 }
 
 resource "aws_security_group" "ecs" {
-  name        = "gatus-ecs-sg-"
+  name        = "gatus-ecs-sg"
   description = "Allow traffic from ALB to ECS tasks on port 8080"
   vpc_id      = var.vpc_id
 
@@ -42,10 +46,30 @@ resource "aws_security_group" "ecs" {
   }
 
   egress {
-    description = "Allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "HTTPS for monitoring endpoints"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "HTTP for monitoring endpoints"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "DNS queries"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "gatus-ecs-sg"
   }
 }
