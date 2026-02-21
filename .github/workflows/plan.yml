@@ -5,7 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'terraform/**'
-      - 'Docker/**'
+      - 'gatus-app/**'
 
 jobs:
   plan:
