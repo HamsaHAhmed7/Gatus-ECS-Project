@@ -6,8 +6,6 @@ Production deployment of Gatus health monitoring on AWS ECS Fargate. This projec
 [![AWS](https://img.shields.io/badge/Cloud-AWS-FF9900?logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
 [![Docker](https://img.shields.io/badge/Container-Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 
-**Live instance:** https://gatus.hamsa-ahmed.co.uk
-
 ---
 
 ## Demo
@@ -28,19 +26,19 @@ Gatus is a health monitoring tool that checks if your services are up. I deploye
 
 ## Key Technical Decisions
 
-**Multi-AZ Setup**  
+**Multi-AZ Setup**
 I deployed across two availability zones with separate NAT gateways. If one zone fails, the other keeps running. Most tutorials skip this but it's essential for production.
 
-**Private Subnets for Containers**  
+**Private Subnets for Containers**
 The ECS tasks run in private subnets with no public IPs. Only the load balancer is internet-facing. This limits the attack surface significantly.
 
-**Built from Source**  
+**Built from Source**
 Instead of using the pre-built Gatus image, I cloned the repo and built it myself using multi-stage Docker builds. Final image is around 45MB vs 150MB for the official one.
 
-**Security Groups with Least Privilege**  
+**Security Groups with Least Privilege**
 The ECS security group only allows traffic from the ALB security group on port 8080. For egress, I restricted it to ports 80, 443, and 53 instead of allowing everything.
 
-**TLS 1.3 Only**  
+**TLS 1.3 Only**
 The load balancer enforces TLS 1.3 and automatically redirects HTTP to HTTPS. Certificates are managed by AWS Certificate Manager with DNS validation.
 
 ---
@@ -161,32 +159,32 @@ Both follow least privilege - only the permissions absolutely required.
 
 ## Why I Made These Choices
 
-**Why private subnets?**  
+**Why private subnets?**
 I wanted to understand how production apps are deployed. Putting containers in public subnets is easier but it means they're directly accessible from the internet if something goes wrong with security groups.
 
-**Why two NAT gateways?**  
+**Why two NAT gateways?**
 One NAT per AZ is the AWS recommended pattern. If I only had one and that AZ failed, containers in the other AZ couldn't reach the internet. Costs more but that's the trade-off for HA.
 
-**Why Fargate instead of EC2?**  
+**Why Fargate instead of EC2?**
 I didn't want to manage instances. Fargate handles patching, scaling, and host management. For a single container app like this, EC2 is overkill.
 
-**Why build from source?**  
+**Why build from source?**
 I wanted to show I can read Go code, understand multi-stage builds, and optimize container images. Also gives me full control over what's in the image.
 
 ---
 
 ## Screenshots
 
-**Gatus Dashboard**  
+**Gatus Dashboard**
 ![Gatus UI](docs/gatus-ui.png)
 
-**Terraform Apply**  
+**Terraform Apply**
 ![Deployment](docs/terraform-apply.png)
 
-**ECS Console**  
+**ECS Console**
 ![ECS Cluster](docs/aws-ecs-cluster.png)
 
-**Infrastructure Teardown**  
+**Infrastructure Teardown**
 ![Terraform Destroy](docs/terraform-destroy.png)
 
 ---
@@ -210,19 +208,19 @@ The NAT gateways are expensive. You could use one instead of two and save £26/m
 
 ## What I Learned
 
-**Terraform modules are worth it**  
+**Terraform modules are worth it**
 Initially I had everything in one file. Breaking it into modules made it way easier to understand and reuse. The VPC module alone is 200+ lines.
 
-**Security groups are more powerful than I thought**  
+**Security groups are more powerful than I thought**
 You can reference other security groups instead of CIDR blocks. This means "allow traffic from the ALB" instead of "allow traffic from these specific IPs."
 
-**NAT gateways vs NAT instances**  
+**NAT gateways vs NAT instances**
 NAT gateways are managed by AWS but cost more. NAT instances are cheaper but you manage them. For production, managed services win.
 
-**DNS validation is better than email validation**  
+**DNS validation is better than email validation**
 ACM can validate your domain ownership through DNS records. Way faster than waiting for emails and you can automate it in Terraform.
 
-**awsvpc mode is the only real option for Fargate**  
+**awsvpc mode is the only real option for Fargate**
 Each task gets its own ENI with a private IP from your subnet. This is different from bridge mode on EC2 where containers share the host network.
 
 ---
@@ -270,10 +268,10 @@ This removes everything: ECS cluster, load balancer, NAT gateways, VPC, Route53 
 
 ## Tech Stack
 
-**AWS Services:** ECS Fargate, VPC, ALB, NAT Gateway, Route53, ACM, ECR, CloudWatch  
-**Infrastructure:** Terraform with modular architecture and S3 remote state  
-**Container:** Docker with multi-stage builds  
-**Application:** Gatus (health monitoring)  
+**AWS Services:** ECS Fargate, VPC, ALB, NAT Gateway, Route53, ACM, ECR, CloudWatch
+**Infrastructure:** Terraform with modular architecture and S3 remote state
+**Container:** Docker with multi-stage builds
+**Application:** Gatus (health monitoring)
 
 ---
 
@@ -289,7 +287,7 @@ This removes everything: ECS cluster, load balancer, NAT gateways, VPC, Route53 
 
 ## Author
 
-Hamsa Ahmed  
+Hamsa Ahmed
 DevOps Engineer based in London
 
 ---
